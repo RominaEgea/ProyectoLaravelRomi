@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+
 class TablaController extends Controller
 {
     function index()
@@ -15,12 +16,20 @@ class TablaController extends Controller
             $response = json_decode($request->getBody()->getContents());
             return view('usersTable', ['users' => $response]);
         } catch(RequestException $e){
-            return $e->getMessage();      
+            return null;      
         }
     }
 
-    function eliminar($id, $username)
-    {
-        return view('userDetails', ['id' => $id, 'username' => $username]);
+    function userDetails(){
+        $username = Request::input('username');
+        try{
+            $client = new Client(['verify' => false]);
+            $request = $client->get('https://api.github.com/users/'.$username);
+            $response = json_decode($request->getBody()->getContents());
+            return json_encode($response);
+        } catch(RequestException $e){
+            return null;
+        }
+        
     }
 }

@@ -3,12 +3,15 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <meta name="csrf-token" content="{{csrf_token() }}">
         <title>Laravel</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+        
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
         <!-- Styles -->
         <style>
             html, body{
@@ -27,24 +30,102 @@
         </style>
 
     </head>
-   
+    <body>
         <div style= "height= 100vh; margin: 3rem; display: grid; place-item:center">
-        <table>
-            <tbody>
-                <tr>
-                    <th>Avatar</th>
-                    <th>Name</th>
-                </tr>
-                @foreach ($users as $user)
-                <tr>
-                    <td><img src="{{$user->avatar_url}}" alt="user avatar" width="100" height="100"></td>
-                    <td><p>{{$user->login}}</p></td>
-                    <td><a href="/eliminarUsuario/{{$user->id}}/{{$user->login}}">Ir a otra página</a></td>
-                </tr>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Avatar</th>
+                        <th>Name</th>
+                    </tr>
+                    @foreach ($users as $user)
+                    <tr>
+                        <td><img src="{{$user->avatar_url}}" alt="user avatar" width="100" height="100"></td>
+                        <td><p>{{$user->login}}</p></td>
+                        <td><button class="btn btn-primary" onclick="redirect('{{$user->login}}')" data-bs-toggle="modal" data-bs-target="#userDetailsModal" data-user="'{{$user->login}}'">Ver más info</button></td>
+                    </tr>
+                        
+                    @endforeach
+                </tbody>
+            </table>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog" style="display: flex;justify-content:center;align-items:center">
+                    <div class="modal-content" style="width: fit-content;">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userDetailsModalLabel">User details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <!--carga por JS de forma dinámica-->
+                        <div id="userDetailsModalBody" class="modal-body text-center">
+                        </div>
                     
-                @endforeach
-            </tbody>
-        </table>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End of modal-->
         </div>
+    
+        <script>
+            function redirect(login){
+                const body = {username: login };
+                $.ajax({
+                    method: 'POST',
+                    url:'/userDetails',
+                    headers: {
+                        'x-CSRF-TOKEN': document.getElementsByTagName("meta")[2].content,
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(body),
+                    success: (response) => {
+                        $("#userDetailsModal").modal({show: true});
+                                      
+                        const parsedResponse = JSON.parse(response);
+                        //avatar_url
+                        //created_at
+                        //company
+                        //email
+                        //followers
+                        //following
+                        //location
+                        //login
+                        //name
+                        const table = `<table>
+                                            <tbody>
+                                                <tr>
+                                                    <th>Avatar</th>
+                                                    <th>Created</th>
+                                                    <th>Company</th>
+                                                    <th>Email</th>
+                                                    <th>Followers</th>
+                                                    <th>Following</th>
+                                                    <th>Location</th>
+                                                    <th>Username</th>
+                                                    <th>Name</th>
+                                                </tr>
+                                            </tbody>
+                                        </table>`;
+                        $('#userDetailsModalBody').append(table);
+                        
+                        const avatarUrl = parsedResponse.avatar_url;
+                        const createdAt = new Date(parsedResponse.created_at).toLocaleDateString("es_AR") ?? 'Does not specify';
+                        const company = parsedResponse.company ?? 'Does not specify';
+                        const email = parsedResponse.email ?? 'Does not specify';
+                        const followers = parsedResponse.followers ?? 'Does not specify';
+                        const following = parsedResponse.following ?? 'Does not specify';
+                        const location = parsedResponse.location ?? 'Does not specify';
+                        const login = parsedResponse.login ?? 'does not specify';
+                        const name = parsedResponse.name ?? 'Does not specify';
+                    }
+                })
+            
+            }
+        </script>
     </body>
 </html>

@@ -14,4 +14,4 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'App\Http\Controllers\TablaController@index');
-Route::get('/eliminarUsuario/{id}/{username}', 'App\Http\Controllers\TablaController@eliminar');
+Route::post('/userDetails/', 'App\Http\Controllers\TablaController@userDetails');
