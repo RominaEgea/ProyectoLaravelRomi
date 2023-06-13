@@ -54,17 +54,14 @@
                 <div class="modal-dialog" style="display: flex;justify-content:center;align-items:center">
                     <div class="modal-content" style="width: fit-content;">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="userDetailsModalLabel">User details</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
+                            <h5 class="modal-title" id="userDetailsModalLabel">Datos del usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>  
                         <!--carga por JS de forma dinámica-->
                         <div id="userDetailsModalBody" class="modal-body text-center">
                         </div>
-                    
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" data-bs-dismiss="modal" aria-label="Close">Cerrar</button>                            
                         </div>
                     </div>
                 </div>
@@ -84,6 +81,7 @@
                     },
                     data: JSON.stringify(body),
                     success: (response) => {
+                        $("#userDetailsModalBody").empty();
                         $("#userDetailsModal").modal({show: true});
                                       
                         const parsedResponse = JSON.parse(response);
@@ -96,11 +94,22 @@
                         //location
                         //login
                         //name
+                   
+                        const avatarUrl = parsedResponse.avatar_url ?? 'Does not specify';
+                        const createdAt = Date(parsedResponse.created_at) ?? 'Does not specify';
+                        const company = parsedResponse.company ?? 'Does not specify';
+                        const email = parsedResponse.email ?? 'Does not specify';
+                        const followers = parsedResponse.followers ?? 'Does not specify';
+                        const following = parsedResponse.following ?? 'Does not specify';
+                        const location = parsedResponse.location ?? 'Does not specify';
+                        const login = parsedResponse.login ?? 'Does not specify';
+                        const name = parsedResponse.name ?? 'Does not specify';
+
                         const table = `<table>
                                             <tbody>
                                                 <tr>
                                                     <th>Avatar</th>
-                                                    <th>Created</th>
+                                                    <th>Creado</th>
                                                     <th>Company</th>
                                                     <th>Email</th>
                                                     <th>Followers</th>
@@ -109,20 +118,52 @@
                                                     <th>Username</th>
                                                     <th>Name</th>
                                                 </tr>
+                                                <tr>
+                                                    <td><img src="${avatarUrl}" alt="avatar image" width="100"/></td>
+                                                    <td><p>${createdAt}</p></td>
+                                                    <td><p>${company}</p></td>
+                                                    <td><p>${email}</p></td>
+                                                    <td><p>${followers}</p></td>
+                                                    <td><p>${following}</p></td>
+                                                    <td><p>${location}</p></td>
+                                                    <td><p>${login}</p></td>
+                                                    <td><p>${name}</p></td>
+                                                 
+                                                </tr>
+                                            
                                             </tbody>
                                         </table>`;
+                        
+                        
                         $('#userDetailsModalBody').append(table);
                         
-                        const avatarUrl = parsedResponse.avatar_url;
-                        const createdAt = new Date(parsedResponse.created_at).toLocaleDateString("es_AR") ?? 'Does not specify';
-                        const company = parsedResponse.company ?? 'Does not specify';
-                        const email = parsedResponse.email ?? 'Does not specify';
-                        const followers = parsedResponse.followers ?? 'Does not specify';
-                        const following = parsedResponse.following ?? 'Does not specify';
-                        const location = parsedResponse.location ?? 'Does not specify';
-                        const login = parsedResponse.login ?? 'does not specify';
-                        const name = parsedResponse.name ?? 'Does not specify';
+                        
+                        // const avatarUrl = parsedResponse.avatar_url;
+                        // const createdat = new date ()
+
+                        // const company = parsedResponse.company ?? 'Does not specify';
+                        // const email = parsedResponse.email ?? 'Does not specify';
+                        // const followers = parsedResponse.followers ?? 'Does not specify';
+                        // const following = parsedResponse.following ?? 'Does not specify';
+                        // const location = parsedResponse.location ?? 'Does not specify';
+                        // const login = parsedResponse.login ?? 'does not specify';
+                        // const name = parsedResponse.name ?? 'Does not specify';
+
+                        /* <tr>
+                            
+                            <td><p>${createdAt}</p></td>
+                            <td><p>${company}</p></td>
+                            <td><p>${email}</p></td>
+                            <td><p>${followers}</p></td>
+                            <td><p>${following}</p></td>
+                            <td><p>${location}</p></td>
+                            <td><p>${login}</p></td>
+                            <td><p>${name}</p></td>
+                        </tr> */
                     }
+                    /* error: (response) => {
+                        alert('An error ocurred, please try again in a few minutes.');
+                    } */
                 })
             
             }
